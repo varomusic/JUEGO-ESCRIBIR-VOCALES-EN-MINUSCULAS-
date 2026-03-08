@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vocales</title>
+
+  <style>
+    :root{
+      --bg1:#ff7eb6;
+      --bg2:#8be9fd;
+      --bg3:#b388ff;
+      --card:rgba(255,255,255,.96);
+      --ink:#1f2937;
+      --muted:#64748b;
+      --shadow:0 18px 40px rgba(0,0,0,.16);
+      --grid:rgba(148,163,184,.14);
+    }
+
+    *{ box-sizing:border-box; }
+
+    body{
+      margin:0;
+      font-family:Arial, Helvetica, sans-serif;
+      color:var(--ink);
+      min-height:100vh;
+      background:
+        radial-gradient(circle at 10% 10%, rgba(255,255,255,.45), transparent 30%),
+        radial-gradient(circle at 90% 15%, rgba(255,255,255,.30), transparent 28%),
+        linear-gradient(135deg,var(--bg1),var(--bg2),var(--bg3));
+      padding:16px;
+    }
+
+    .app{
+      max-width:900px;
+      margin:auto;
+      background:var(--card);
+      border-radius:34px;
+      box-shadow:var(--shadow);
+      overflow:hidden;
+      border:2px solid rgba(255,255,255,.7);
+    }
+
+    .header{
+      padding:22px 22px 10px;
+      background:linear-gradient(90deg, rgba(255,255,255,.65), rgba(255,255,255,.35));
+    }
+
+    .header-top{
+      display:flex;
+      gap:14px;
+      align-items:center;
+      justify-content:space-between;
+      flex-wrap:wrap;
+    }
+
+    .title{
+      margin:0;
+      font-size:clamp(28px,4vw,46px);
+      font-weight:900;
+    }
+
+    .subtitle{
+      margin:8px 0 0;
+      color:var(--muted);
+      font-size:clamp(14px,2vw,19px);
+      font-weight:700;
+    }
+
+    .badges{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .badge{
+      background:white;
+      border-radius:999px;
+      padding:12px 16px;
+      font-weight:900;
+      box-shadow:0 8px 18px rgba(0,0,0,.08);
+      font-size:15px;
+      white-space:nowrap;
+    }
+
+    .content{
+      padding:18px 22px 24px;
+    }
+
+    .panel{
+      background:rgba(255,255,255,.88);
+      border:2px solid rgba(0,0,0,.06);
+      border-radius:28px;
+      padding:18px;
+      box-shadow:0 8px 20px rgba(0,0,0,.06);
+    }
+
+    .draw-wrap{
+      background:linear-gradient(135deg,#fff,#f8fafc);
+      border:2px dashed rgba(124,58,237,.18);
+      border-radius:28px;
+      padding:16px;
+    }
+
+    .draw-top{
+      display:flex;
+      gap:12px;
+      justify-content:space-between;
+      align-items:center;
+      flex-wrap:wrap;
+      margin-bottom:12px;
+    }
+
+    .draw-title{
+      margin:0;
+      font-size:clamp(24px,2.6vw,38px);
+      font-weight:900;
+    }
+
+    .draw-subtitle{
+      margin:4px 0 0;
+      color:var(--muted);
+      font-weight:800;
+      font-size:16px;
+    }
+
+    .practice-tools{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+      flex-wrap:wrap;
+      margin-bottom:12px;
+      padding:12px;
+      border-radius:20px;
+      background:#f8fafc;
+      border:2px solid rgba(0,0,0,.06);
+    }
+
+    .color-row{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+
+    .color-label{
+      font-weight:900;
+      color:#475569;
+      margin-right:2px;
+    }
+
+    .color-btn{
+      width:46px;
+      height:46px;
+      border-radius:50%;
+      border:4px solid white;
+      cursor:pointer;
+      box-shadow:0 8px 16px rgba(0,0,0,.14);
+    }
+
+    .color-btn.active{
+      outline:4px solid rgba(15,23,42,.15);
+      transform:scale(1.05);
+    }
+
+    .btn{
+      border:0;
+      border-radius:18px;
+      padding:14px 18px;
+      font-size:16px;
+      font-weight:900;
+      color:white;
+      cursor:pointer;
+      box-shadow:0 10px 18px rgba(0,0,0,.12);
+    }
+
+    .btn:active{ transform:scale(.98); }
+
+    .btn-hear{ background:linear-gradient(135deg,#8b5cf6,#ec4899); }
+    .btn-clear{ background:linear-gradient(135deg,#0ea5e9,#2563eb); }
+    .btn-check{ background:linear-gradient(135deg,#22c55e,#16a34a); }
+    .btn-next{ background:linear-gradient(135deg,#fb923c,#ef4444); }
+    .btn-new{ background:linear-gradient(135deg,#64748b,#334155); }
+
+    .action-row{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-bottom:12px;
+    }
+
+    .canvas-shell{
+      position:relative;
+      border-radius:28px;
+      overflow:hidden;
+      background:white;
+      border:2px solid rgba(0,0,0,.08);
+      min-height:620px;
+      touch-action:none;
+    }
+
+    .grid{
+      position:absolute;
+      inset:0;
+      background-image:
+        linear-gradient(to right, var(--grid) 1px, transparent 1px),
+        linear-gradient(to bottom, var(--grid) 1px, transparent 1px);
+      background-size:34px 34px;
+      pointer-events:none;
+      z-index:0;
+    }
+
+    .guide-image{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      object-fit:contain;
+      pointer-events:none;
+      z-index:1;
+      padding:28px;
+    }
+
+    .draw-canvas{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      display:block;
+      z-index:2;
+    }
+
+    .canvas-top-corner{
+      position:absolute;
+      top:14px;
+      right:14px;
+      z-index:3;
+    }
+
+    .msg{
+      background:linear-gradient(135deg,#ecfdf5,#f0fdf4);
+      border:2px solid rgba(34,197,94,.18);
+      border-radius:22px;
+      padding:14px 16px;
+      font-size:20px;
+      font-weight:900;
+      margin-top:14px;
+    }
+
+    .overlay{
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,.45);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:16px;
+      z-index:9999;
+    }
+
+    .modal{
+      width:min(560px, 100%);
+      background:rgba(255,255,255,.97);
+      border:2px solid rgba(255,255,255,.7);
+      border-radius:24px;
+      box-shadow:var(--shadow);
+      padding:20px;
+      text-align:center;
+    }
+
+    .modal h3{
+      margin:0 0 10px 0;
+      font-size:28px;
+      font-weight:900;
+    }
+
+    .modal p{
+      margin:0 0 14px 0;
+      color:#475569;
+      font-size:16px;
+      font-weight:700;
+      line-height:1.4;
+    }
+
+    .modal input{
+      width:100%;
+      padding:14px;
+      font-size:18px;
+      border-radius:16px;
+      border:2px solid rgba(0,0,0,.12);
+      margin-bottom:12px;
+      outline:none;
+    }
+
+    .modal .row{
+      display:flex;
+      gap:10px;
+      justify-content:center;
+      flex-wrap:wrap;
+    }
+
+    .prize-emoji{
+      font-size:90px;
+      margin-bottom:8px;
+      filter:drop-shadow(0 10px 18px rgba(0,0,0,.18));
+    }
+
+    .hidden{
+      display:none !important;
+    }
+
+    @media (max-width: 640px){
+      .canvas-shell{ min-height:500px; }
+      .practice-tools, .draw-top{ align-items:stretch; }
+      .action-row .btn{ width:100%; }
+      .guide-image{ padding:18px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="overlay" id="nameOverlay">
+    <div class="modal">
+      <h3>👋 Bienvenido</h3>
+      <p>Escribe el nombre del jugador para comenzar.</p>
+      <input id="playerInput" type="text" maxlength="20" placeholder="Nombre del jugador" autocomplete="off">
+      <div class="row">
+        <button class="btn btn-check" id="startBtn">Empezar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="overlay hidden" id="prizeOverlay">
+    <div class="modal">
+      <div class="prize-emoji" id="prizeEmoji">🍦</div>
+      <h3 id="prizeTitle">¡Premio!</h3>
+      <p id="prizeText">Texto premio</p>
+      <div class="row">
+        <button class="btn btn-check" id="continueBtn">Seguir jugando</button>
+        <button class="btn btn-new" id="changePlayerBtn">Nuevo jugador</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="app">
+    <div class="header">
+      <div class="header-top">
+        <div>
+          <h1 class="title">Vocales</h1>
+          <p class="subtitle">Traza cada vocal siguiendo su imagen guía exacta.</p>
+        </div>
+
+        <div class="badges">
+          <div class="badge">👤 <span id="badgePlayer">—</span></div>
+          <div class="badge">🔤 Vocal: <span id="badgeVowel">a</span></div>
+          <div class="badge">⭐ Estrellas: <span id="badgeStars">0</span></div>
+          <div class="badge">🎁 Premio: <span id="badgePrize">0/5</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="content">
+      <section class="panel">
+        <div class="draw-wrap">
+          <div class="draw-top">
+            <div>
+              <h3 class="draw-title">Zona de práctica</h3>
+              <p class="draw-subtitle">Completa las 5 vocales para ganar un premio.</p>
+            </div>
+          </div>
+
+          <div class="practice-tools">
+            <div class="color-row" id="colorRow">
+              <span class="color-label">Colores:</span>
+            </div>
+          </div>
+
+          <div class="action-row">
+            <button class="btn btn-clear" id="clearBtn">🧽 Borrar</button>
+            <button class="btn btn-check" id="checkBtn">✅ Revisar</button>
+            <button class="btn btn-next" id="nextBtn">➡️ Siguiente</button>
+            <button class="btn btn-new" id="newPlayerBtn">👤 Nuevo jugador</button>
+          </div>
+
+          <div class="canvas-shell" id="canvasShell">
+            <div class="grid"></div>
+
+            <img
+              id="guideImage"
+              class="guide-image"
+              src="a.png"
+              alt="Guía de vocal"
+              onerror="showImageError()"
+            />
+
+            <canvas class="draw-canvas" id="drawCanvas"></canvas>
+
+            <div class="canvas-top-corner">
+              <button class="btn btn-hear" id="hearBtn">🔊 Escuchar vocal</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="msg" id="messageBox">Repasa la vocal siguiendo la imagen guía.</div>
+      </section>
+    </div>
+
+    <div class="footer-note">
+      APP creada por Alvaro Ariza
+    </div>
+  </div>
+
+  <script>
+    const vowels = [
+      { id:"a", vowel:"a", file:"a.png" },
+      { id:"e", vowel:"e", file:"e.png" },
+      { id:"i", vowel:"i", file:"i.png" },
+      { id:"o", vowel:"o", file:"o.png" },
+      { id:"u", vowel:"u", file:"u.png" }
+    ];
+
+    const colors = [
+      { id:"amarillo", value:"#facc15" },
+      { id:"azul", value:"#2563eb" },
+      { id:"rojo", value:"#ef4444" }
+    ];
+
+    const prizes = [
+      { emoji:"🍦", title:"¡Primer premio!", text:"Ganaste un delicioso helado." },
+      { emoji:"🎁", title:"¡Segundo premio!", text:"Ganaste un regalo sorpresa." },
+      { emoji:"👟", title:"¡Tercer premio!", text:"Ganaste unos zapatos." },
+      { emoji:"🧸", title:"¡Cuarto premio!", text:"Ganaste un juguete sorpresa." },
+      { emoji:"⚽", title:"¡Quinto premio!", text:"Ganaste una pelota de colores muy hermosa." }
+    ];
+
+    const praisePhrases = [
+      "Excelente",
+      "Muy bien",
+      "Así se hace",
+      "Eres inteligente",
+      "Eres el mejor",
+      "Perfecto",
+      "Fantástico",
+      "Qué bien lo haces",
+      "Bravo",
+      "Súper bien"
+    ];
+
+    let currentIndex = 0;
+    let stars = 0;
+    let currentColor = colors[0].value;
+    let isDrawing = false;
+    let speechUnlocked = false;
+    let playerName = "";
+    let completedThisCycle = 0;
+    let prizeIndex = 0;
+    let completedFlags = [false, false, false, false, false];
+    const brushWidth = 18;
+
+    const badgePlayer = document.getElementById("badgePlayer");
+    const badgeVowel = document.getElementById("badgeVowel");
+    const badgeStars = document.getElementById("badgeStars");
+    const badgePrize = document.getElementById("badgePrize");
+    const messageBox = document.getElementById("messageBox");
+    const hearBtn = document.getElementById("hearBtn");
+    const clearBtn = document.getElementById("clearBtn");
+    const checkBtn = document.getElementById("checkBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const newPlayerBtn = document.getElementById("newPlayerBtn");
+    const drawCanvas = document.getElementById("drawCanvas");
+    const canvasShell = document.getElementById("canvasShell");
+    const colorRow = document.getElementById("colorRow");
+    const guideImage = document.getElementById("guideImage");
+    const ctx = drawCanvas.getContext("2d");
+
+    const nameOverlay = document.getElementById("nameOverlay");
+    const playerInput = document.getElementById("playerInput");
+    const startBtn = document.getElementById("startBtn");
+
+    const prizeOverlay = document.getElementById("prizeOverlay");
+    const prizeEmoji = document.getElementById("prizeEmoji");
+    const prizeTitle = document.getElementById("prizeTitle");
+    const prizeText = document.getElementById("prizeText");
+    const continueBtn = document.getElementById("continueBtn");
+    const changePlayerBtn = document.getElementById("changePlayerBtn");
+
+    function getCurrentVowel() {
+      return vowels[currentIndex];
+    }
+
+    function safeName() {
+      return playerName && playerName.trim() ? playerName.trim() : "amigo";
+    }
+
+    function updateHud() {
+      badgePlayer.textContent = safeName();
+      badgeVowel.textContent = getCurrentVowel().vowel;
+      badgeStars.textContent = stars;
+      badgePrize.textContent = `${Math.min(prizeIndex, 5)}/5`;
+    }
+
+    function setMessage(text, type = "normal") {
+      messageBox.textContent = text;
+
+      if (type === "warn") {
+        messageBox.style.background = "linear-gradient(135deg,#fff7ed,#ffedd5)";
+        messageBox.style.borderColor = "rgba(249,115,22,.24)";
+      } else if (type === "good") {
+        messageBox.style.background = "linear-gradient(135deg,#dcfce7,#f0fdf4)";
+        messageBox.style.borderColor = "rgba(34,197,94,.24)";
+      } else {
+        messageBox.style.background = "linear-gradient(135deg,#ecfdf5,#f0fdf4)";
+        messageBox.style.borderColor = "rgba(34,197,94,.18)";
+      }
+    }
+
+    function showImageError() {
+      const item = getCurrentVowel();
+      setMessage(`No se encontró el archivo ${item.file}. Revisa que esté en la misma carpeta que index.html`, "warn");
+    }
+
+    function resizeCanvas() {
+      const rect = canvasShell.getBoundingClientRect();
+      const ratio = window.devicePixelRatio || 1;
+      drawCanvas.width = rect.width * ratio;
+      drawCanvas.height = rect.height * ratio;
+      ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+    }
+
+    function clearCanvasOnly() {
+      ctx.clearRect(0, 0, drawCanvas.width, drawCanvas.height);
+    }
+
+    function getPointFromEvent(e) {
+      const rect = canvasShell.getBoundingClientRect();
+
+      let clientX;
+      let clientY;
+
+      if (e.touches && e.touches[0]) {
+        clientX = e.touches[0].clientX;
+        clientY = e.touches[0].clientY;
+      } else if (e.changedTouches && e.changedTouches[0]) {
+        clientX = e.changedTouches[0].clientX;
+        clientY = e.changedTouches[0].clientY;
+      } else {
+        clientX = e.clientX;
+        clientY = e.clientY;
+      }
+
+      return {
+        x: clientX - rect.left,
+        y: clientY - rect.top
+      };
+    }
+
+    function startDrawing(e) {
+      e.preventDefault();
+      unlockSpeech();
+      isDrawing = true;
+
+      const p = getPointFromEvent(e);
+
+      ctx.beginPath();
+      ctx.moveTo(p.x, p.y);
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+      ctx.strokeStyle = currentColor;
+      ctx.lineWidth = brushWidth;
+    }
+
+    function moveDrawing(e) {
+      if (!isDrawing) return;
+
+      e.preventDefault();
+
+      const p = getPointFromEvent(e);
+      ctx.lineTo(p.x, p.y);
+      ctx.stroke();
+    }
+
+    function stopDrawing() {
+      isDrawing = false;
+    }
+
+    function unlockSpeech() {
+      if (speechUnlocked) return;
+
+      speechUnlocked = true;
+
+      try {
+        const synth = window.speechSynthesis;
+        if (!synth) return;
+
+        const u = new SpeechSynthesisUtterance(" ");
+        u.volume = 0;
+        u.lang = "es-ES";
+        synth.speak(u);
+        setTimeout(() => synth.cancel(), 60);
+      } catch (e) {}
+    }
+
+    function speak(text) {
+      unlockSpeech();
+
+      const synth = window.speechSynthesis;
+      if (!synth) return;
+
+      try {
+        synth.cancel();
+        synth.resume();
+      } catch (e) {}
+
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.lang = "es-ES";
+      utter.rate = 0.9;
+      utter.pitch = 1.0;
+      synth.speak(utter);
+    }
+
+    function speakLetter() {
+      speak(getCurrentVowel().vowel);
+    }
+
+    function randomPraise() {
+      return praisePhrases[Math.floor(Math.random() * praisePhrases.length)];
+    }
+
+    function renderColorButtons() {
+      colors.forEach((item, index) => {
+        const btn = document.createElement("button");
+        btn.className = "color-btn" + (index === 0 ? " active" : "");
+        btn.style.background = item.value;
+        btn.title = item.id;
+
+        btn.addEventListener("click", () => {
+          document.querySelectorAll(".color-btn").forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
+          currentColor = item.value;
+        });
+
+        colorRow.appendChild(btn);
+      });
+    }
+
+    function loadCurrentVowel() {
+      const item = getCurrentVowel();
+      guideImage.src = item.file;
+      guideImage.alt = `Guía de vocal ${item.vowel}`;
+      updateHud();
+    }
+
+    function clearPractice() {
+      clearCanvasOnly();
+      setMessage("Trazo borrado. Puedes intentarlo otra vez.", "warn");
+    }
+
+    function countColoredPixels() {
+      const imageData = ctx.getImageData(0, 0, drawCanvas.width, drawCanvas.height).data;
+      let count = 0;
+      for (let i = 3; i < imageData.length; i += 4) {
+        if (imageData[i] > 0) count++;
+      }
+      return count;
+    }
+
+    function nextVowel() {
+      currentIndex = (currentIndex + 1) % vowels.length;
+      loadCurrentVowel();
+      clearCanvasOnly();
+      setMessage(`Sigue con la vocal ${getCurrentVowel().vowel}.`);
+    }
+
+    function checkPrizeCycle() {
+      if (completedThisCycle >= 5) {
+        const prize = prizes[Math.min(prizeIndex, prizes.length - 1)];
+        prizeEmoji.textContent = prize.emoji;
+        prizeTitle.textContent = prize.title;
+        prizeText.textContent = `${safeName()}, ${prize.text}`;
+        prizeOverlay.classList.remove("hidden");
+        speak(`${prize.title}. ${safeName()}, ${prize.text}`);
+        completedThisCycle = 0;
+        completedFlags = [false, false, false, false, false];
+        prizeIndex = Math.min(prizeIndex + 1, prizes.length);
+        updateHud();
+      }
+    }
+
+    function reviewPractice() {
+      const pixelCount = countColoredPixels();
+
+      if (pixelCount < 2500) {
+        setMessage("Traza un poco más la vocal para revisarla.", "warn");
+        speak(`${safeName()}, intenta un poco más.`);
+        return;
+      }
+
+      const phrase = randomPraise();
+      const currentVowel = getCurrentVowel().vowel;
+
+      if (!completedFlags[currentIndex]) {
+        completedFlags[currentIndex] = true;
+        completedThisCycle++;
+        stars++;
+      }
+
+      updateHud();
+      setMessage(`${phrase}, ${safeName()}. Completaste la vocal ${currentVowel}.`, "good");
+      speak(`${phrase}, ${safeName()}. Completaste la vocal ${currentVowel}.`);
+
+      checkPrizeCycle();
+
+      if (prizeOverlay.classList.contains("hidden")) {
+        setTimeout(() => {
+          nextVowel();
+        }, 1200);
+      }
+    }
+
+    function resetPlayerState() {
+      currentIndex = 0;
+      stars = 0;
+      currentColor = colors[0].value;
+      completedThisCycle = 0;
+      prizeIndex = 0;
+      completedFlags = [false, false, false, false, false];
+      document.querySelectorAll(".color-btn").forEach((b, i) => {
+        b.classList.toggle("active", i === 0);
+      });
+      clearCanvasOnly();
+      loadCurrentVowel();
+      updateHud();
+      setMessage(`Hola ${safeName()}, vamos a practicar las vocales.`);
+    }
+
+    function openNameModal() {
+      nameOverlay.classList.remove("hidden");
+      playerInput.value = "";
+      setTimeout(() => playerInput.focus(), 80);
+    }
+
+    function closeNameModal() {
+      nameOverlay.classList.add("hidden");
+    }
+
+    function startPlayer() {
+      playerName = playerInput.value.trim() || "Jugador";
+      closeNameModal();
+      resetPlayerState();
+      speak(`Hola ${safeName()}`);
+    }
+
+    startBtn.addEventListener("click", startPlayer);
+    playerInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") startPlayer();
+    });
+
+    hearBtn.addEventListener("click", speakLetter);
+    clearBtn.addEventListener("click", clearPractice);
+    checkBtn.addEventListener("click", reviewPractice);
+    nextBtn.addEventListener("click", nextVowel);
+
+    newPlayerBtn.addEventListener("click", () => {
+      openNameModal();
+    });
+
+    continueBtn.addEventListener("click", () => {
+      prizeOverlay.classList.add("hidden");
+      nextVowel();
+    });
+
+    changePlayerBtn.addEventListener("click", () => {
+      prizeOverlay.classList.add("hidden");
+      openNameModal();
+    });
+
+    drawCanvas.addEventListener("mousedown", startDrawing);
+    drawCanvas.addEventListener("mousemove", moveDrawing);
+    window.addEventListener("mouseup", stopDrawing);
+
+    drawCanvas.addEventListener("touchstart", startDrawing, { passive: false });
+    drawCanvas.addEventListener("touchmove", moveDrawing, { passive: false });
+    window.addEventListener("touchend", stopDrawing);
+
+    window.addEventListener("resize", resizeCanvas);
+
+    document.addEventListener("click", unlockSpeech, { once: true });
+    document.addEventListener("touchstart", unlockSpeech, { once: true });
+
+    renderColorButtons();
+    resizeCanvas();
+    updateHud();
+    openNameModal();
+  </script>
+</body>
+</html>
